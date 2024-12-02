@@ -43,7 +43,7 @@ def init_driver():
 def get_wikipedia_content(query):
     driver = init_driver()
     try:
-        url = f"https://en.wikipedia.org/wiki/{query.replace(' ', '_')}"
+        url = f"https://ru.wikipedia.org/wiki/{query.replace(' ', '_')}"
         driver.get(url)
         paragraphs = driver.find_elements(By.CSS_SELECTOR, "p")
         content = [p.text for p in paragraphs if p.text.strip() != '']
