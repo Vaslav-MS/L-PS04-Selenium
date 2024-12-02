@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
+import random
 
 # Initialize bot with your token
 BOT_TOKEN = '7823676791:AAFsMtrS6NhFuMVkYDrsnNyuOmFZsBQe6Os'
@@ -41,6 +42,18 @@ def get_wikipedia_content(query):
     except Exception as e:
         driver.quit()
         return None, [f"Error retrieving content: {str(e)}"]
+
+# Function to get related articles from Wikipedia page
+def get_related_articles(driver):
+    related_links = []
+    for element in driver.find_elements(By.TAG_NAME, 'div'):
+        if element.get_attribute('class') == 'hatnote navigation-not-searchable':
+            links = element.find_elements(By.TAG_NAME, 'a')
+            for link in links:
+                href = link.get_attribute('href')
+                if href and "/wiki/" in href and not any(sub in href for sub in [":", "#"]):
+                    related_links.append(link.text)
+    return related_links
 
 # Start command
 @bot.message_handler(commands=['start', 'help'])
@@ -96,19 +109,25 @@ def callback_query(call):
     elif call.data == 'prev':
         send_article_content(chat_id, session.current_paragraph_index - 1)
     elif call.data == 'related':
-        bot.send_message(chat_id, "Функция просмотра связанных статей находится в разработке.")
+        driver = init_driver()
+        try:
+            driver.get(session.current_url)
+            related_articles = get_related_articles(driver)
+            driver.quit()
+            if related_articles:
+                random_article = random.choice(related_articles)
+                url, paragraphs = get_wikipedia_content(random_article)
+                if paragraphs:
+                    session.current_url = url
+                    session.paragraphs = paragraphs
+                    send_article_content(chat_id, 0)
+                else:
+                    bot.send_message(chat_id, "Не удалось загрузить связанную статью.")
+            else:
+                bot.send_message(chat_id, "Нет доступных связанных статей.")
+        except Exception as e:
+            driver.quit()
+            bot.send_message(chat_id, f"Error: {str(e)}")
 
 if __name__ == '__main__':
     bot.polling(none_stop=True)
-
-
-#browser = webdriver.Firefox()
-#browser.get('https://ru.wikipedia.org/wiki/%D0%A1%D0%BE%D0%BB%D0%BD%D0%B5%D1%87%D0%BD%D0%B0%D1%8F_%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0')
-#statnotes = []
-#for element in browser.find_elements(By.TAG_NAME, 'div'):
-#    if element.get_attribute('class') == 'hatnote navigation-not-searchable':
-#        statnotes.append(element)
-#for statnote in statnotes:
-#    link = statnote.find_element(By.TAG_NAME, 'a').get_attribute('href')
-#    link = statnote.find_element(By.TAG_NAME, 'a').get_attribute('title')
-#    print(link)
