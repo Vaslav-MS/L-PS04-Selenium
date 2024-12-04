@@ -62,7 +62,7 @@ def get_related_articles(driver):
 # Start command
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, "Добро пожаловать в Википедийный бот! Напишите ваш запрос для начала работы.")
+    bot.reply_to(message, "Добро пожаловать в Википедийный бот! Напишите ваш запрос для начала работы. Далее вы можете двигаться по параграфам найденной статьи, открывать случайную вложенную статью или написать новый запрос.")
 
 # Handle queries
 @bot.message_handler(func=lambda message: True)
@@ -90,11 +90,11 @@ def send_article_content(chat_id, paragraph_index):
     session.current_paragraph_index = paragraph_index
     paragraph = session.paragraphs[paragraph_index]
 
-    keyboard = InlineKeyboardMarkup(row_width=2)
-    prev_button = InlineKeyboardButton("Prev", callback_data='prev', disabled=(paragraph_index == 0))
-    next_button = InlineKeyboardButton("Next", callback_data='next', disabled=(paragraph_index == len(session.paragraphs) - 1))
-    keyboard.add(prev_button, next_button)
-    keyboard.add(InlineKeyboardButton("Похожие статьи", callback_data='related'))
+    keyboard = InlineKeyboardMarkup(row_width=3)
+    prev_button = InlineKeyboardButton("<<<", callback_data='prev', disabled=(paragraph_index == 0))
+    next_button = InlineKeyboardButton(">>>", callback_data='next', disabled=(paragraph_index == len(session.paragraphs) - 1))
+    relt_button = InlineKeyboardButton("..статья..", callback_data='related')
+    keyboard.add(prev_button, relt_button, next_button)
 
     bot.send_message(chat_id, paragraph, reply_markup=keyboard)
 
