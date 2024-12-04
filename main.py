@@ -40,7 +40,7 @@ def get_wikipedia_content(query):
     try:
         url = f"https://ru.wikipedia.org/wiki/{query.replace(' ', '_')}"
         driver.get(url)
-        paragraphs = driver.find_elements(By.CSS_SELECTOR, "p")
+        paragraphs = driver.find_elements(By.TAG_NAME, "p")
         content = [p.text for p in paragraphs if p.text.strip() != '']
         driver.quit()
         return url, content
@@ -55,9 +55,8 @@ def get_related_articles(driver):
         if element.get_attribute('class') == 'hatnote navigation-not-searchable':
             links = element.find_elements(By.TAG_NAME, 'a')
             for link in links:
-                href = link.get_attribute('href')
-                if href and "/wiki/" in href and not any(sub in href for sub in [":", "#"]):
-                    related_links.append(link.text)
+                title = link.get_attribute('title')
+                related_links.append(title)
     return related_links
 
 # Start command
@@ -121,6 +120,7 @@ def callback_query(call):
             driver.quit()
             if related_articles:
                 random_article = random.choice(related_articles)
+                print(random_article)
                 url, paragraphs = get_wikipedia_content(random_article)
                 if paragraphs:
                     session.current_url = url
