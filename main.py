@@ -93,7 +93,7 @@ def send_article_content(chat_id, paragraph_index):
     keyboard = InlineKeyboardMarkup(row_width=3)
     prev_button = InlineKeyboardButton("<<<", callback_data='prev', disabled=(paragraph_index == 0))
     next_button = InlineKeyboardButton(">>>", callback_data='next', disabled=(paragraph_index == len(session.paragraphs) - 1))
-    relt_button = InlineKeyboardButton("..статья..", callback_data='related')
+    relt_button = InlineKeyboardButton(".. статья ..", callback_data='related')
     keyboard.add(prev_button, relt_button, next_button)
 
     bot.send_message(chat_id, paragraph, reply_markup=keyboard)
