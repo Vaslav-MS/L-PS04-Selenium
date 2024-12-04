@@ -6,9 +6,14 @@ from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 import random
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Initialize bot with your token
-BOT_TOKEN = '7823676791:AAFsMtrS6NhFuMVkYDrsnNyuOmFZsBQe6Os'
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # Temporary storage for user sessions
